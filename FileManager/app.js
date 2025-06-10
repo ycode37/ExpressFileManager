@@ -18,6 +18,14 @@ app.use(express.urlencoded({extended:true}));
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Add secure cookie options
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+};
+
 
 
 
@@ -72,8 +80,8 @@ app.post('/register' , async (req,res)=>{
                 age
             });
 
-            let token = jwt.sign({email:email , userid: user._id} , 'secret')
-            res.cookie('token' , token);
+            let token = jwt.sign({email:email , userid: user._id} , process.env.JWT_SECRET || 'secret')
+            res.cookie('token' , token, cookieOptions);
             res.redirect('/profile');
         })
     })
@@ -87,14 +95,12 @@ app.post('/login' , async (req,res)=>{
 
     bcrypt.compare(password , user.password , function(err,result){
         if(result){
-
-            let token = jwt.sign({email:email , userid: user._id} , 'secret')
-            res.cookie('token' , token);
-            res.status(200).redirect('/profile');
-
-        } 
-        // RESTful practices – In APIs, different status codes convey different meanings (e.g., 200 = OK, 404 = Not Found, 401 = Unauthorized).
-        else res.redirect('/');
+            let token = jwt.sign({email:email , userid: user._id} , process.env.JWT_SECRET || 'secret')
+            res.cookie('token' , token, cookieOptions);
+            res.redirect('/profile');
+        } else {
+            res.redirect('/login');
+        }
     })
 
 
@@ -122,13 +128,24 @@ app.get('/logout' , (req,res)=>{
 })
 
 function isLoggedIn (req,res,next){
-    const token = req.cookies.token;
-    if(!token || token.trim() === "") return res.redirect('/login');
-    else{
-        let data= jwt.verify(req.cookies.token , 'secret');
-        req.user =data;
+    try {
+        const token = req.cookies.token;
+        if(!token || token.trim() === "") {
+            return res.redirect('/login');
+        }
+        
+        const data = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+        if (!data || !data.email) {
+            res.clearCookie('token');
+            return res.redirect('/login');
+        }
+        
+        req.user = data;
+        next();
+    } catch (error) {
+        res.clearCookie('token');
+        return res.redirect('/login');
     }
-    next();
 }
 
 const PORT = process.env.PORT || 3000;
