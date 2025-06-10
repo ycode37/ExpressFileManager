@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://kit.fontawesome.com/b74d84033a.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="w-full min-h-screen bg-zinc-800 text-white p-10">
+        <a class="bg-red-400 rounded-md px-3 py-2 text-sm mb-5 inline-block" href="/logout">logout</a>
+        <div class="flex items-start gap-4 mb-3">
+               <div class="w-10 h-10 rounded-md">
+                <img class="w-full h-full object-cover overflow-hidden rounded-md" src="/images/uploads/<%= user.profilepic %>" alt="" class="src">
+               </div>
+        <h3 class="text-3xl mb-7">Hello <%= user.name%> 🫡</h3>
+        </div>
+     
+        <form action="/post" method="post">
+            <textarea placeholder="what's on your mind" class="w-1/3 p-3 outline-none resize-none bg-transparent border-2 border-zinc-700 rounded-md" name="content" id=""></textarea>
+            <input class="px-3 py-2 bg-blue-500 block rounded-md mt-2 w-40" type="submit">
+        </form>
+         <div class="postcontainer mt-10">
+        
+              <% user.posts.reverse().forEach(function(post){%>
+ <div class="post w-2/3 p-4 border-2 border-zinc-700 text-white bg-zinc-600 rounded-md mb-2">
+            <h4 class="text-blue-500 mb-2"><%= user.username %></h4>
+            <p class="text-sm tracking-tight"><%=post.content%></p>
+            <div class="btns flex mt-5 flex gap-4">
+               <a href="/like/<%= post._id%>" ><i class="fa-regular fa-thumbs-up"></i></a> 
+               <a href="" class="text-zinc-700">edit</a>
+            </div>
+        </div>
+      <% })%>
+        
+       
+    </div>
+    </div>
+
+
+   
+</body>
+</html>
