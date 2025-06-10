@@ -5,7 +5,6 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(() => {
     console.log('Connected to MongoDB Atlas');
     console.log('Connection URI:', process.env.MONGODB_URI); 
-})
 .catch(err => {
     console.error('MongoDB connection error:', err);
 });
