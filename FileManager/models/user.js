@@ -1,8 +1,8 @@
-mongoose.connect(process.env.Cluster0, {
+mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 15000, // Increase timeout to 15 seconds
-    socketTimeoutMS: 45000, // How long to wait for responses from MongoDB
+    serverSelectionTimeoutMS: 15000, 
+    socketTimeoutMS: 45000,
 })
 .then(() => {
     console.log('Connected to MongoDB Atlas');
@@ -11,7 +11,7 @@ mongoose.connect(process.env.Cluster0, {
     console.error('MongoDB connection error:', err);
 });
 
-// Add this to handle connection events
+
 mongoose.connection.on('error', err => {
     console.error('MongoDB connection error:', err);
 });
