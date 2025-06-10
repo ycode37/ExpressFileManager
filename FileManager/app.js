@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const mongoose = require('mongoose');
 const userModel = require('./models/user');
 const postModel = require('./models/post');
 const bcrypt = require('bcrypt')
@@ -8,8 +9,29 @@ const cookieParser = require('cookie-parser');
 const upload = require('./config/multerconfig');
 const path = require('path');
 
+// MongoDB Connection
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
+    socketTimeoutMS: 45000,
+    connectTimeoutMS: 30000,
+})
+.then(() => {
+    console.log('Connected to MongoDB Atlas');
+})
+.catch(err => {
+    console.error('MongoDB connection error:', err);
+});
 
+// Handle MongoDB connection events
+mongoose.connection.on('error', err => {
+    console.error('MongoDB connection error:', err);
+});
 
+mongoose.connection.on('disconnected', () => {
+    console.log('MongoDB disconnected');
+});
 
 app.set('view engine' , 'ejs');
 app.set('views', path.join(__dirname, 'views'));
